@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <title>Text to Binary</title>
+</head>
+<body>
+    
+    <h1 class="container" style="color: blue; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;">Text to Binary v2</h1>
+        <div class="container border border-primary rounded-4">
+            <div class="input-group mb-3 container py-3">
+                <input class="textInput form-control" placeholder="Input a text" style="outline: none;"></input>
+                <button class="switchToBinary btn btn-primary">Switch to Binary</button>
+            </div>
+            <h2>Binary Result:</h2>
+            <div class="result"></div>
+        </div>
+
+    <script>
+    
+    let listTextBinary = [
+        {text: 'Hello', translate: '01001000 01100101 01101100 01101100 01101111'},
+        {text: 'World', translate: '01010111 01101111 01110010 01101100 01100100'},
+        {text: 'Binary', translate: '01000010 01101001 01101110 01100001 01110010 01111001'},
+        {text: 'Example', translate: '01000101 01111000 01101100 01100001 01101101 01110000 01101100 01100101'}
+    ];
+
+    document.querySelector('.switchToBinary').addEventListener('click', binary);
+
+    function renderTranslateBinary() {
+        let htmlBinary = '';
+
+        listTextBinary.forEach((list) => {
+            const text = list.text;
+            const translate = list.translate;
+
+            htmlBinary += `<div class="mb-3"><p><b>${text}</b> ➡️<br>${translate}</p></div>`;
+        });
+
+        document.querySelector('.result').innerHTML = htmlBinary;
+    }
+
+    function binary() {
+        const textInput = document.querySelector('.textInput');
+        let originalText = textInput.value.trim();
+
+        if (!originalText) {
+            return;
+        }
+
+        if (/^\d+$/.test(originalText)) {
+            const number = parseInt(originalText);
+            const binary = number.toString(2);
+            const explanation = `
+                <code>Decimal: ${number}</code><br>
+                Binary: <b>${binary}</b><br>
+                Solution:<br>
+                ${explainBinarySteps(number)}
+            `;
+
+            listTextBinary.push({
+                text: originalText,
+                translate: explanation
+            });
+        } else {
+           
+            let binaryLines = [];
+
+            for (let i = 0; i < originalText.length; i++) {
+                const char = originalText[i];
+                const ascii = char.charCodeAt(0);
+                const binary = ascii.toString(2).padStart(8, '0');
+                binaryLines.push(`<code>${char}</code> (DECIMAL: ${ascii}) ➡️ <b>${binary}</b>`);
+            }
+
+            listTextBinary.push({
+                text: originalText,
+                translate: binaryLines.join('<br>')
+            });
+        }
+
+        renderTranslateBinary();
+        textInput.value = '';
+    }
+
+    function explainBinarySteps(number) {
+        let n = number;
+        let steps = '';
+        let count = 0;
+
+        while (n > 0) {
+            const quotient = Math.floor(n / 2);
+            const remainder = n % 2;
+            steps = `Step ${++count}: ${n} ÷ 2 = ${quotient} remainder ${remainder}<br>` + steps;
+            n = quotient;
+        }
+
+        return steps || "0";
+    }
+
+    document.querySelector('.textInput').addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            binary();
+        }
+    });
+
+    renderTranslateBinary();
+</script>
+
+
+</body>
+</html>
